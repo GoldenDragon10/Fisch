@@ -138,28 +138,36 @@
       }, 3000); // Match animation duration
     }
 
-    // Function to trigger the animation on follow event
+    // Function to handle follow events and trigger the animation
     function showFollowAnimation(followerName) {
-      selectedItem.textContent = `Thank you for following, ${followerName}!`; // Show follower name
+      selectedItem.textContent = `Thank you for following, ${followerName}!`; // Display follower name
       selectedItem.style.opacity = 1;
 
       populateItems(); // Populate the item container dynamically
       setTimeout(() => {
-        openCrate(); // Trigger crate opening
+        openCrate(); // Trigger crate opening animation
       }, 1000); // Delay before opening the crate
     }
 
     // Listen for the message event (webhook data)
-    window.addEventListener("message", function(event) {
+    window.addEventListener("message", function (event) {
+      // Parse the URL-encoded data from the webhook
       const params = new URLSearchParams(event.data);
-      if (params.has('content')) {
-        const followerName = params.get('content'); // Extract follower's name
-        showFollowAnimation(followerName); // Trigger animation
+
+      // Extract relevant fields from the payload
+      const followerName = params.get('username') || params.get('nickname') || "A New Follower"; // Use username or nickname
+      const triggerTypeId = params.get('triggerTypeId'); // Identify the type of event
+
+      // Check if the event is a follow (triggerTypeId = 9 is likely for follows in TikFinity)
+      if (triggerTypeId === "9") {
+        showFollowAnimation(followerName); // Trigger the animation for the follower
+      } else {
+        console.log("Event is not a follow, ignoring...");
       }
     });
 
     // For testing, simulate a follow event:
-    // window.postMessage("value1=Testuser&value2=&content=Testuser&userId=1&username=Testuser&nickname=Test+User&commandParams=&triggerTypeId=9&tikfinityUserId=1064421&tikfinityUsername=thegoldendragon", "*");
+    // window.postMessage("value1=Testuser&value2=&content=Fisch&userId=1&username=Testuser&nickname=Test+User&commandParams=&triggerTypeId=9&tikfinityUserId=1064421&tikfinityUsername=thegoldendragon", "*");
   </script>
 </body>
 </html>
