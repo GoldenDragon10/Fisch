@@ -105,17 +105,21 @@
     }
 
     function openCase() {
-      populateItems();
+      populateItems(); // Populate the items
       document.querySelector(".items").style.animation = "scroll 3s ease-out forwards";
-      const resultItem = pickRandomItem();
 
+      const resultItem = pickRandomItem();
       setTimeout(() => {
         document.getElementById("result").textContent = `You got: ${resultItem.name} (${resultItem.rarity})!`;
-      }, 3000); // Match animation duration
+      }, 3000);
     }
 
-    // Initialize
-    document.body.addEventListener("click", openCase);
+    // Webhook Listener for TikFinity
+    window.addEventListener("message", (event) => {
+      if (event.data === "open_crate") {
+        openCase(); // Call the case-opening function
+      }
+    });
   </script>
 </body>
 </html>
