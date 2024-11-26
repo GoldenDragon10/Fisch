@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Follow Animation</title>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #1e1e2f;
+      color: white;
+    }
+
+    .follow-box {
+      position: absolute;
+      padding: 20px;
+      background-color: rgba(0, 0, 0, 0.7);
+      border-radius: 10px;
+      font-size: 2rem;
+      display: none;
+      animation: fadeInOut 5s ease-in-out forwards;
+    }
+
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: scale(0.5); }
+      20% { opacity: 1; transform: scale(1); }
+      80% { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(0.5); }
+    }
+
+  </style>
+</head>
+<body>
+  <!-- The Follow Animation Box -->
+  <div id="followBox" class="follow-box">
+    <p>Thank you for following!</p>
+  </div>
+
+  <script>
+    // Function to trigger the follow animation
+    function showFollowAnimation() {
+      const followBox = document.getElementById("followBox");
+      followBox.style.display = "block"; // Show the box
+      followBox.style.animation = "fadeInOut 5s ease-in-out forwards"; // Trigger animation
+    }
+
+    // Listen for webhook messages (i.e., follow event)
+    window.addEventListener("message", function(event) {
+      // Check if the event is a follow event (based on TikFinity's default behavior)
+      if (event.data && event.data.action === "new_follow") {
+        showFollowAnimation(); // Trigger animation when a new follow occurs
+      }
+    });
+  </script>
+</body>
+</html>
