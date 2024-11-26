@@ -16,55 +16,51 @@
       overflow: hidden;
     }
 
-    /* Crate Opening Animation Container */
+    /* Crate Box for Animation */
     .crate-box {
-      width: 400px;
-      height: 400px;
+      width: 700px;
+      height: 150px;
       background-color: #333;
       border-radius: 10px;
       display: none; /* Initially hidden */
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+      position: relative;
+      overflow: hidden;
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
     }
 
-    /* Animation for the opening crate */
-    .crate-content {
-      width: 100%;
+    /* Scrolling Items */
+    .item-container {
+      display: flex;
+      position: absolute;
+      top: 0;
+      left: 0;
       height: 100%;
+      animation: none;
+    }
+
+    .item {
+      width: 150px;
+      height: 100%;
+      margin: 0 5px;
       background-color: #222;
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 3rem;
-      color: #fff;
-      text-align: center;
-      padding: 20px;
-      font-family: 'Arial', sans-serif;
-      animation: openCrate 4s ease-out forwards;
+      border-radius: 5px;
+      overflow: hidden;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
     }
 
-    @keyframes openCrate {
-      0% {
-        transform: scale(0.5);
-        opacity: 0;
-      }
-      50% {
-        transform: scale(1.1);
-        opacity: 1;
-      }
-      100% {
-        transform: scale(1);
-        opacity: 1;
-      }
+    .item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
     /* Item reveal animation */
-    .reveal-item {
-      display: none;
-      font-size: 1.5rem;
+    .selected-item {
+      font-size: 2rem;
+      color: #fff;
       margin-top: 20px;
       opacity: 0;
       animation: revealItem 2s ease-in-out forwards;
@@ -74,92 +70,96 @@
       0% { opacity: 0; }
       100% { opacity: 1; }
     }
-
   </style>
 </head>
 <body>
-  <!-- Crate Box for the Animation -->
+  <!-- Crate Box -->
   <div id="crateBox" class="crate-box">
-    <div id="crateContent" class="crate-content">
-      <p id="openingMessage">Opening Crate...</p>
+    <div id="itemContainer" class="item-container">
+      <!-- Dynamically populated items will go here -->
     </div>
   </div>
 
-  <!-- Items that can be revealed from the crate -->
-  <div id="item1" class="reveal-item">AK-47 | Redline</div>
-  <div id="item2" class="reveal-item">M4A4 | Howl</div>
-  <div id="item3" class="reveal-item">AWP | Dragon Lore</div>
-  <div id="item4" class="reveal-item">USP-S | Orion</div>
-  <div id="item5" class="reveal-item">Glock-18 | Water Elemental</div>
+  <!-- Revealed Item -->
+  <div id="selectedItem" class="selected-item">You Got: </div>
 
   <script>
-    // List of possible CS:GO items
+    // List of items (modify with your own image paths and item names)
     const items = [
-      "AK-47 | Redline",
-      "M4A4 | Howl",
-      "AWP | Dragon Lore",
-      "USP-S | Orion",
-      "Glock-18 | Water Elemental"
+      { name: "AK-47 | Redline", image: "ak47.png" },
+      { name: "M4A4 | Howl", image: "m4a4.png" },
+      { name: "AWP | Dragon Lore", image: "awp.png" },
+      { name: "USP-S | Orion", image: "usp.png" },
+      { name: "Glock-18 | Water Elemental", image: "glock.png" }
     ];
+
+    const container = document.getElementById("itemContainer");
+    const crateBox = document.getElementById("crateBox");
+    const selectedItem = document.getElementById("selectedItem");
+
+    // Function to dynamically populate the item container with duplicates
+    function populateItems() {
+      const originalItems = [...items]; // Make a copy of the original items
+      const duplicateCount = 3; // Number of times to duplicate items
+
+      // Add duplicates to the items array
+      for (let i = 0; i < duplicateCount; i++) {
+        items.push(...originalItems); // Add duplicates of the original items
+      }
+
+      // Populate the item container dynamically
+      container.innerHTML = ""; // Clear any existing items
+      items.forEach(item => {
+        const itemDiv = document.createElement("div");
+        itemDiv.classList.add("item");
+        itemDiv.innerHTML = `<img src="${item.image}" alt="${item.name}">`;
+        container.appendChild(itemDiv);
+      });
+    }
 
     // Function to simulate the crate opening and reveal an item
     function openCrate() {
-      const crateBox = document.getElementById("crateBox");
-      const crateContent = document.getElementById("crateContent");
-      const openingMessage = document.getElementById("openingMessage");
+      crateBox.style.display = "block"; // Show the crate box
 
-      // Show the crate box
-      crateBox.style.display = "block";
+      // Calculate total width for scrolling
+      const itemWidth = 160; // Width + margin of each item
+      const totalItems = items.length; // Updated with duplicates
+      const selectedIndex = Math.floor(Math.random() * (totalItems / 3)); // Select from original set
+      const stopPosition = -(selectedIndex * itemWidth) + 275; // Center selected item in the box
 
-      // Start with "Opening Crate..." message
-      openingMessage.textContent = "Opening Crate...";
+      // Animate the container
+      container.style.transition = "transform 3s cubic-bezier(0.25, 0.8, 0.25, 1)";
+      container.style.transform = `translateX(${stopPosition}px)`; // Scroll to selected item
 
-      // Simulate crate animation
+      // Reveal the selected item after the animation ends
       setTimeout(() => {
-        // Randomly choose an item from the list
-        const item = items[Math.floor(Math.random() * items.length)];
-
-        // Change the message to the item revealed
-        openingMessage.textContent = `You Got: ${item}`;
-
-        // Display the item
-        showItem(item);
-      }, 3000); // After 3 seconds, reveal the item
-    }
-
-    // Function to display the item
-    function showItem(itemName) {
-      const itemDiv = document.getElementById(`item${items.indexOf(itemName) + 1}`);
-      itemDiv.style.display = "block";
-      setTimeout(() => {
-        itemDiv.style.animation = "revealItem 2s ease-in-out forwards";
-      }, 1000); // Delay the reveal animation
+        selectedItem.textContent = `You Got: ${items[selectedIndex].name}`;
+        selectedItem.style.opacity = 1;
+      }, 3000); // Match animation duration
     }
 
     // Function to trigger the animation on follow event
     function showFollowAnimation(followerName) {
-      const crateBox = document.getElementById("crateBox");
-      const crateContent = document.getElementById("crateContent");
-      const openingMessage = document.getElementById("openingMessage");
-      openingMessage.textContent = `Thank you for following, ${followerName}!`; // Show follower name
-      crateContent.style.animation = "none"; // Remove any previous animation styles
-      crateBox.style.display = "block"; // Show the crate box
+      selectedItem.textContent = `Thank you for following, ${followerName}!`; // Show follower name
+      selectedItem.style.opacity = 1;
+
+      populateItems(); // Populate the item container dynamically
       setTimeout(() => {
-        openCrate();  // Trigger crate opening animation
-      }, 1000); // Wait for a second before opening the crate
+        openCrate(); // Trigger crate opening
+      }, 1000); // Delay before opening the crate
     }
 
-    // Listen for the message event (webhook data) and trigger the crate opening animation
+    // Listen for the message event (webhook data)
     window.addEventListener("message", function(event) {
       const params = new URLSearchParams(event.data);
       if (params.has('content')) {
-        const followerName = params.get('content');  // Extract the follower's name
-        showFollowAnimation(followerName);  // Trigger the animation
+        const followerName = params.get('content'); // Extract follower's name
+        showFollowAnimation(followerName); // Trigger animation
       }
     });
+
+    // For testing, simulate a follow event:
+    // window.postMessage("value1=Testuser&value2=&content=Testuser&userId=1&username=Testuser&nickname=Test+User&commandParams=&triggerTypeId=9&tikfinityUserId=1064421&tikfinityUsername=thegoldendragon", "*");
   </script>
 </body>
 </html>
-
-
-
