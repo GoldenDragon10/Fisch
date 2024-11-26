@@ -37,24 +37,31 @@
 <body>
   <!-- The Follow Animation Box -->
   <div id="followBox" class="follow-box">
-    <p>Thank you for following!</p>
+    <p id="followMessage">Thank you for following!</p>
   </div>
 
   <script>
     // Function to trigger the follow animation
-    function showFollowAnimation() {
+    function showFollowAnimation(followerName) {
       const followBox = document.getElementById("followBox");
+      const followMessage = document.getElementById("followMessage");
+      followMessage.textContent = `Thank you for following, ${followerName}!`; // Display follower name
       followBox.style.display = "block"; // Show the box
       followBox.style.animation = "fadeInOut 5s ease-in-out forwards"; // Trigger animation
     }
 
     // Listen for webhook messages (i.e., follow event)
     window.addEventListener("message", function(event) {
-      // Check if the event is a follow event (based on TikFinity's default behavior)
-      if (event.data && event.data.action === "new_follow") {
-        showFollowAnimation(); // Trigger animation when a new follow occurs
+      // Extract the URL-encoded data from the incoming event
+      const params = new URLSearchParams(event.data);
+
+      // Check if the data contains the 'content' field (follow event)
+      if (params.has('content')) {
+        const followerName = params.get('content'); // Extract the follower name
+        showFollowAnimation(followerName);  // Trigger the animation with the follower's name
       }
     });
   </script>
 </body>
 </html>
+
