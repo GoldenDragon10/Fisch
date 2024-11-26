@@ -52,7 +52,7 @@
 
     // Listen for webhook messages (i.e., follow event)
     window.addEventListener("message", function(event) {
-      // Extract the URL-encoded data from the incoming event
+      // Extract URL-encoded data from the incoming event
       const params = new URLSearchParams(event.data);
 
       // Check if the data contains the 'content' field (follow event)
@@ -64,4 +64,5 @@
   </script>
 </body>
 </html>
+
 
